@@ -11,7 +11,7 @@ main = do
     let opCodes = csvInts input
     --let opCodes = [1,9,10,3,2,3,11,0,99,30,40,50]
     --let opCodes = [1,0,0,0,99]
-    putStrLn $ show $ part1 opCodes
+    putStrLn $ show $ part2 opCodes
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
