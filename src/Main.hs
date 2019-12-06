@@ -8,7 +8,7 @@ main :: IO ()
 main = do
     fileName <- getDataFileName "day3.txt"
     input <- readFile fileName
-    putStrLn $ show $ part1 (245318, 765747)
+    putStrLn $ show $ part2 (245318, 765747)
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
