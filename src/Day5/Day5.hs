@@ -18,6 +18,10 @@ runProgram state io
     | operation == 2  = mul state params io
     | operation == 3  = input state io
     | operation == 4  = output state params io
+    | operation == 5  = jumpIfTrue state params io
+    | operation == 6  = jumpIfFalse state params io
+    | operation == 7  = lessThan state params io
+    | operation == 8  = equals state params io
     | operation == 99 = (memory, outputs)
     | otherwise = ([], [])
     where (memory, address) = state
@@ -51,6 +55,34 @@ output (memory, address) params (input, output) =
     runProgram (memory, address + 2) (input, newOutput)
     where toAdd = get (parameterMode 0 params) (memory, address + 1)
           newOutput = toAdd : output
+
+jumpIfTrue :: State -> Params -> MachineIO -> (Memory, Outputs)
+jumpIfTrue = jump (/= 0)
+
+jumpIfFalse :: State -> Params -> MachineIO -> (Memory, Outputs)
+jumpIfFalse = jump (== 0)
+
+jump :: (Int -> Bool) -> State -> Params -> MachineIO -> (Memory, Outputs)
+jump test (memory, address) params io
+    | test val  = runProgram (memory, jump) io
+    | otherwise = runProgram (memory, address + 3) io
+    where val   = get (parameterMode 0 params) (memory, address + 1)
+          jump  = get (parameterMode 1 params) (memory, address + 2)
+
+lessThan :: State -> Params -> MachineIO -> (Memory, Outputs)
+lessThan = testVal (<)
+
+equals :: State -> Params -> MachineIO -> (Memory, Outputs)
+equals = testVal (==)
+
+testVal :: (Int -> Int -> Bool) -> State -> Params -> MachineIO -> (Memory, Outputs)
+testVal test (memory, address) params io
+    | val1 `test` val2 = run 1
+    | otherwise   = run 0
+    where val1 = get (parameterMode 0 params) (memory, address + 1)
+          val2 = get (parameterMode 1 params) (memory, address + 2)
+          pos  = getAt (memory, address + 3)
+          run  = \val -> runProgram (insert memory pos val, address + 4) io
 
 insert :: Memory -> Int -> Int -> Memory
 insert memory pos val = before ++ [val] ++ after
