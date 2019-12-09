@@ -8,20 +8,30 @@ type Planet = String
 type Orbits = Data.Set.Set Planet
 type Universe = Data.Map.Map Planet Orbits
 
+type BacktrackMap = Data.Map.Map Planet Planet
+
 part1 :: [String] -> Integer
 part1 strings = getDepth 0 universe "COM" 
     where
         descriptors = map splitDescriptor strings
-        universe = foldr addOrbit emptyUniverse descriptors
+        universe = foldr addOrbit Data.Map.empty descriptors
+
+part2 :: [String] -> Integer
+part2 strings = santaDist + youDist
+    where
+        descriptors = map splitDescriptor strings
+        backtrackMap = foldr addBacktrack Data.Map.empty descriptors
+        santaMap = backtrackFrom "COM" "SAN" backtrackMap
+        youMap = backtrackFrom "COM" "YOU" backtrackMap
+        overlap = last $ overlaps (reverse santaMap) (reverse youMap)
+        santaDist = distance (tail santaMap) overlap
+        youDist = distance (tail youMap) overlap
 
 splitDescriptor :: String -> (Planet, Planet)
 splitDescriptor str = (one, two)
     where 
         splitString = Data.List.Split.splitOn ")" str
         (one : two : []) = splitString
-
-emptyUniverse :: Universe
-emptyUniverse = Data.Map.empty
 
 addOrbit :: (Planet, Planet) -> Universe -> Universe
 addOrbit (p1, p2) u
@@ -39,3 +49,22 @@ getDepth i u p = Data.Set.foldr fun i ps
 
 addDepth :: Integer -> Universe -> Planet -> Integer -> Integer
 addDepth i1 u p i2 = i2 + getDepth i1 u p
+
+addBacktrack :: (Planet, Planet) -> BacktrackMap -> BacktrackMap
+addBacktrack (p1, p2) = Data.Map.insert p2 p1
+
+backtrackFrom :: Planet -> Planet -> BacktrackMap -> [Planet]
+backtrackFrom t p b 
+    | p == t = [p]
+    | otherwise = p : (backtrackFrom t p2 b)
+    where p2 = Data.Map.findWithDefault "" p b
+
+overlaps :: [Planet] -> [Planet] -> [Planet]
+overlaps (a : as) (b : bs)
+    | a == b = a : overlaps as bs
+    | otherwise = []
+
+distance :: [Planet] -> Planet -> Integer
+distance (p:ps) t
+    | p == t = 0
+    | otherwise = 1 + (distance ps t)
