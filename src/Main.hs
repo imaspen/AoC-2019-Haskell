@@ -1,15 +1,14 @@
 module Main where
-import Day5.Day5
+import Day6.Day6
 import Paths_AoC2019
 
 import Data.List.Split
 
 main :: IO ()
 main = do
-    fileName <- getDataFileName "day5.txt"
+    fileName <- getDataFileName "day6.txt"
     input <- readFile fileName
-    let program = csvInts input
-    mapM_ (putStrLn . show) $ part1 program [5]
+    putStrLn . show $ part1 $ lines input
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
