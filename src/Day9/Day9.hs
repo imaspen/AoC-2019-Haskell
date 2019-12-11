@@ -10,7 +10,11 @@ type State = (Memory, Address, RelativeBase, Input, Output, Halted)
 
 part1 :: Memory -> Output
 part1 memory = output
-    where (outMem, _, _, _, output, _) = step (memory ++ (repeat 0), 0, 0, [1], [], False)
+    where (_, _, _, _, output, _) = step (memory ++ (repeat 0), 0, 0, [1], [], False)
+
+part2 :: Memory -> Output
+part2 memory = output
+    where (_, _, _, _, output, _) = step (memory ++ (repeat 0), 0, 0, [2], [], False)
 
 step :: State -> State
 step state

@@ -11,7 +11,7 @@ main = do
     let test1 = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
     let test2 = [1102,34915192,34915192,7,4,7,99,0]
     let test3 = [104,1125899906842624,99]
-    putStrLn $ show $ part1 $ csvInts input
+    putStrLn $ show $ part2 $ csvInts input
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
