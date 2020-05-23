@@ -10,7 +10,9 @@ main = do
     input <- readFile fileName
     let test1 = [".#..#",".....","#####","....#","...##"]
     let test2 = ["..#..","..#..","#.#.#",".###.","#####"]
+    -- putStrLn $ show $ part1 test1
     putStrLn $ show $ part1 $ lines input
+
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
