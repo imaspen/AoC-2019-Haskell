@@ -7,11 +7,13 @@ import Data.List.Split
 main :: IO ()
 main = do
     fileName <- getDataFileName "day10.txt"
+    testFileName <- getDataFileName "day10test.txt"
     input <- readFile fileName
+    test3 <- readFile testFileName
     let test1 = [".#..#",".....","#####","....#","...##"]
     let test2 = ["..#..","..#..","#.#.#",".###.","#####"]
-    -- putStrLn $ show $ part1 test1
-    putStrLn $ show $ part1 $ lines input
+    putStrLn $ show $ part2 $ lines test3
+    putStrLn $ show $ part2 $ lines input
 
 
 listOfInts :: String -> [Integer]
