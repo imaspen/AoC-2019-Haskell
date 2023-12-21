@@ -1,5 +1,8 @@
 module Day13.Day13 where
 
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
+
 type Memory = [Int]
 
 type Address = Int
@@ -12,28 +15,31 @@ type Output = [Int]
 
 type Halted = Bool
 
-type State = (Memory, Address, RelativeBase, Input, Output, Halted)
+type Point = (Int, Int)
+
+type State = (Memory, Address, RelativeBase, Input, Output, Halted, Output, Map Point Int)
 
 part1 :: Memory -> Int
 part1 memory = countBricks output
   where
-    (_, _, _, _, output, _) = step (memory ++ repeat 0, 0, 0, [], [], False)
+    (_, _, _, _, output, _, _, _) = step (memory ++ repeat 0, 0, 0, [], [], False, [], Map.empty)
 
 countBricks :: Output -> Int
-countBricks (id : _ : _ : rest) = if id == 2 then 1 + countBricks rest else countBricks rest
+countBricks (2 : _ : _ : rest) = 1 + countBricks rest
+countBricks (_ : _ : _ : rest) = countBricks rest
 countBricks _ = 0
 
-part2 :: Memory -> Output
-part2 memory = output
+part2 :: Memory -> Int
+part2 memory = tiles Map.! (-1, 0)
   where
-    (_, _, _, _, output, _) = step (memory ++ repeat 0, 0, 0, [], [], False)
+    (_, _, _, _, _, _, _, tiles) = step ([2] ++ drop 1 memory ++ repeat 0, 0, 0, [], [], False, [], Map.empty)
 
 step :: State -> State
 step state
   | halted = state
   | otherwise = step $ execute state
   where
-    (_, _, _, _, _, halted) = state
+    (_, _, _, _, _, halted, _, _) = state
 
 execute :: State -> State
 execute state
@@ -46,58 +52,70 @@ execute state
   | op == 7 = comp (<) state
   | op == 8 = comp (==) state
   | op == 9 = offsetRel state
-  | op == 99 = (memory, address, rel, input, output, True)
+  | op == 99 = (memory, address, rel, input, output, True, nextTile, tiles)
   where
-    (memory, address, rel, input, output, halted) = state
+    (memory, address, rel, input, output, halted, nextTile, tiles) = state
     op = opcode $ getAt memory address
 
 arithmetic :: (Int -> Int -> Int) -> State -> State
-arithmetic op state = (newMem, address + 4, r, i, o, h)
+arithmetic op state = (newMem, address + 4, r, i, o, h, n, t)
   where
-    (memory, address, r, i, o, h) = state
+    (memory, address, r, i, o, h, n, t) = state
     v1 = getWithParam 0 state
     v2 = getWithParam 1 state
     pos = getPos 2 state
     newMem = insert memory pos (v1 `op` v2)
 
 getInput :: State -> State
-getInput state = (newMem, address + 2, r, rest, o, h)
+getInput state = (newMem, address + 2, r, newInput, o, h, n, t)
   where
-    (memory, address, r, val : rest, o, h) = state
+    (memory, address, r, input, o, h, n, t) = state
+    (val, newInput) = getInputVal input
     pos = getPos 0 state
     newMem = insert memory pos val
 
+getInputVal :: Input -> (Int, Input)
+getInputVal (val : rest) = (val, rest)
+-- don't bother moving the paddle, just add blocks to the bottom of the screen ;)
+getInputVal _ = (0, [])
+
 putOutput :: State -> State
-putOutput state = (memory, address + 2, r, i, newOut, h)
-  where
-    (memory, address, r, i, output, h) = state
-    val = getWithParam 0 state
-    newOut = val : output
+putOutput state =
+  let (memory, address, r, i, output, h, nextTile, tiles) = state
+      val = getWithParam 0 state
+      newOut = val : output
+      (newTile, newTiles, wasReplacement) = updateTiles val nextTile tiles
+      halted = wasReplacement && Map.null (Map.filter (2 ==) tiles)
+   in (memory, address + 2, r, i, newOut, halted, newTile, newTiles)
+
+updateTiles :: Int -> [Int] -> Map Point Int -> ([Int], Map Point Int, Bool)
+updateTiles id (y : x : _) tiles = ([], Map.insert (x, y) id tiles, Map.member (x, y) tiles)
+updateTiles val nextTile tiles = (val : nextTile, tiles, False)
 
 jump :: (Int -> Bool) -> State -> State
 jump test state
-  | test v1 = (memory, v2, r, i, o, h)
-  | otherwise = (memory, address + 3, r, i, o, h)
+  | test v1 = (memory, v2, r, i, o, h, n, t)
+  | otherwise = (memory, address + 3, r, i, o, h, n, t)
   where
-    (memory, address, r, i, o, h) = state
+    (memory, address, r, i, o, h, n, t) = state
     v1 = getWithParam 0 state
     v2 = getWithParam 1 state
 
 comp :: (Int -> Int -> Bool) -> State -> State
 comp op state
-  | v1 `op` v2 = (newMem 1, address + 4, r, i, o, h)
-  | otherwise = (newMem 0, address + 4, r, i, o, h)
+  | v1 `op` v2 = (newMem 1, address + 4, r, i, o, h, n, t)
+  | otherwise = (newMem 0, address + 4, r, i, o, h, n, t)
   where
-    (memory, address, r, i, o, h) = state
+    (memory, address, r, i, o, h, n, t) = state
     v1 = getWithParam 0 state
     v2 = getWithParam 1 state
     pos = getPos 2 state
     newMem = insert memory pos
 
 offsetRel :: State -> State
-offsetRel state = (memory, address + 2, newRel, i, o, h)
+offsetRel state = (memory, address + 2, newRel, i, o, h, n, t)
   where
-    (memory, address, rel, i, o, h) = state
+    (memory, address, rel, i, o, h, n, t) = state
     ps = getParams memory address
     v1 = getWithParam 0 state
     newRel = rel + v1
@@ -108,12 +126,12 @@ insert memory pos val = before ++ [val] ++ after
     (before, _ : after) = splitAt pos memory
 
 getWithParam :: Int -> State -> Int
-getWithParam i (m, a, r, _, _, _) = get r (parameterMode i ps) m (a + i + 1)
+getWithParam i (m, a, r, _, _, _, _, _) = get r (parameterMode i ps) m (a + i + 1)
   where
     ps = getParams m a
 
 getPos :: Int -> State -> Int
-getPos offset (m, a, r, _, _, _)
+getPos offset (m, a, r, _, _, _, _, _)
   | mode == 0 = val
   | mode == 2 = val + r
   where

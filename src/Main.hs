@@ -15,7 +15,7 @@ main = do
 
   putStrLn "Part 2:"
 
--- print $ part2 memory
+  print $ part2 memory
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
