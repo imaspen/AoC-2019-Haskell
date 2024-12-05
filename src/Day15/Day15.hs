@@ -113,6 +113,19 @@ part1 memory =
       (goal, _) = Maybe.fromMaybe ((0, 0), Goal) $ find (\(_, l) -> l == Goal) $ Map.toList cleanSeen
    in show $ distances Map.! goal
 
+part2 :: Memory -> String
+part2 memory =
+  let input = (North, (0, 0), Map.singleton (0, 0) Empty)
+      output = step (memory ++ repeat 0, 0, 0, input, [], False)
+      (_, _, _, (_, _, seen), _, _) = output
+      cleanSeen = Map.filter (/= Wall) seen
+      (goal, _) = Maybe.fromMaybe ((0, 0), Goal) $ find (\(_, l) -> l == Goal) $ Map.toList cleanSeen
+      queue = Map.keysSet cleanSeen
+      dist = Map.singleton goal (Dist 0)
+      previous = Map.empty
+      (distances, _) = loop queue dist previous
+   in show $ maximum (Map.elems distances)
+
 loop :: Queue -> Distances -> Previous -> (Distances, Previous)
 loop queue distances previous =
   if Set.null queue
