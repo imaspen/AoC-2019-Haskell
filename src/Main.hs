@@ -15,14 +15,14 @@ main = do
   fileNameTest3 <- getDataFileName "day16.test.3.txt"
   inputTest3 <- readFile fileNameTest3
 
-  putStrLn "Part 1 Tests:"
-  print $ 24176176 == part1 (allInts inputTest1)
-  print $ 73745418 == part1 (allInts inputTest2)
-  print $ 52432133 == part1 (allInts inputTest3)
+  putStrLn "Part 2 Tests:"
+  print $ 84462026 == part2 (allInts inputTest1)
+  print $ 78725270 == part2 (allInts inputTest2)
+  print $ 53553731 == part2 (allInts inputTest3)
 
   putStrLn ""
-  putStrLn "Part 1:"
-  print $ part1 $ allInts input
+  putStrLn "Part 2:"
+  print $ part2 $ allInts input
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
