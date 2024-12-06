@@ -17,12 +17,13 @@ data-dir:            res
 
 executable AoC2019
   main-is:             Main.hs
-  other-modules:       Day17.Day17
+  other-modules:       Day18.Day18
                        Paths_AoC2019
   -- other-extensions:    
   build-depends:       base,
                        split,
                        containers,
+                       deque,
                        vector,
                        ilist,
                        numeric-limits
