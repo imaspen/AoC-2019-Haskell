@@ -17,7 +17,7 @@ data-dir:            res
 
 executable AoC2019
   main-is:             Main.hs
-  other-modules:       Day18.Day18
+  other-modules:       Day19.Day19
                        Paths_AoC2019
   -- other-extensions:    
   build-depends:       base,
