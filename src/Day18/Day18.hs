@@ -32,11 +32,24 @@ data State = State
   }
   deriving (Show)
 
+data State' = State'
+  { positions :: (Point, Point, Point, Point),
+    collectedKeys' :: Set Key,
+    distance' :: Int
+  }
+  deriving (Show)
+
 type Discovery = (Point, HeldKeys)
+
+type Discovery' = ((Point, Point, Point, Point), HeldKeys)
 
 type Discovered = Set Discovery
 
+type Discovered' = Set Discovery'
+
 type Queue = Deque State
+
+type Queue' = Deque State'
 
 part1 :: [String] -> Int
 part1 lines =
@@ -45,6 +58,9 @@ part1 lines =
       queue = fromList [State startPoint Set.empty 0]
       out = search vault keys queue Set.empty
    in out
+
+part2 :: [[String]] -> Int
+part2 lines = sum $ map part1 lines
 
 search :: Vault -> AllKeys -> Queue -> Discovered -> Int
 search vault allKeys queue discovered =
@@ -68,10 +84,13 @@ isDiscovered state = Set.member (stateToDiscovery state)
 
 getAdjacencies :: Vault -> State -> [State]
 getAdjacencies vault state =
-  let (x, y) = position state
+  let pos = position state
       heldKeys = collectedKeys state
       dist = 1 + distance state
-   in Maybe.mapMaybe (isAdjacent vault heldKeys dist) [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+   in Maybe.mapMaybe (isAdjacent vault heldKeys dist) $ getNeighbors pos
+
+getNeighbors :: Point -> [Point]
+getNeighbors (x, y) = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
 
 isAdjacent :: Vault -> HeldKeys -> Int -> Point -> Maybe State
 isAdjacent vault heldKeys dist point = case Map.lookup point vault of
