@@ -15,7 +15,36 @@ type Halted = Bool
 type State = (Memory, Address, RelativeBase, Input, Output, Halted)
 
 part1 :: Memory -> Int
-part1 memory = sum $ map (\y -> sum $ map (\x -> head $ runIntCode memory [y, x]) [0 .. 49]) [0 .. 49]
+part1 memory = sum $ map (\y -> sum $ map (\x -> head $ runIntCode memory [x, y]) [0 .. 49]) [0 .. 49]
+
+-- derived formulas from inspecting outputs and poking coordinates
+-- right line -> x = 2y
+-- left line -> x = (17/11)y
+
+-- formula for top right x
+-- x = 2y
+-- bottom left in relation to top right
+-- x - 99 = (17/11) * (y + 99)
+-- 11x - 1089 = 17 * (y + 99)
+-- 11x - 1089 = 17y + 1683
+-- 11x = 17y + 2772
+-- x = (17y + 2772) / 11
+-- 2y = (17y + 2772) / 11
+-- 22y = 17y + 2772
+-- 5y = 2772
+-- y = 554.4
+-- round up, top-right y = 555
+-- top-right x = 1110
+-- top-left x = 1011
+
+part2 :: Int
+part2 = 1011 * 10000 + 555
+
+printMap :: Memory -> String
+printMap memory =
+  let output = map (\y -> map (\x -> head $ runIntCode memory [x, y]) [0 .. 49]) [0 .. 49]
+      o = map (\line -> '\n' : map (\x -> if x == 1 then '#' else '.') line) output
+   in concat o
 
 runIntCode :: Memory -> Input -> Output
 runIntCode memory input =
@@ -140,4 +169,4 @@ parameters :: Int -> Int
 parameters instruction = instruction `quot` 100
 
 parameterMode :: Int -> Int -> Int
-parameterMode position instruction = instruction `quot` (10 ^ position) `rem` 10
+parameterMode position instruction = instruction `quot` 10 ^ position `rem` 10
