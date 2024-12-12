@@ -9,6 +9,9 @@ main = do
   testFileName <- getDataFileName "day20.test.1.txt"
   testInput <- readFile testFileName
 
+  testFileName2 <- getDataFileName "day20.test.2.txt"
+  testInput2 <- readFile testFileName2
+
   fileName <- getDataFileName "day20.txt"
   input <- readFile fileName
 
@@ -18,6 +21,14 @@ main = do
   putStrLn ""
   putStrLn "Part 1:"
   print $ part1 (lines input) ((32, 32), (86, 90))
+
+  putStrLn ""
+  putStrLn "Part 2 Tests:"
+  print $ part2 (lines testInput2) ((8, 8), (36, 28))
+
+  putStrLn ""
+  putStrLn "Part 2:"
+  print $ part2 (lines input) ((32, 32), (86, 90))
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
