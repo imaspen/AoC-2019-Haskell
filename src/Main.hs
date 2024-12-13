@@ -9,7 +9,7 @@ main = do
   fileName <- getDataFileName "day21.txt"
   input <- readFile fileName
 
-  putStrLn $ part1 $ csvInts input
+  putStrLn $ part2 $ csvInts input
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)

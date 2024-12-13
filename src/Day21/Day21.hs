@@ -19,8 +19,8 @@ type Halted = Bool
 
 type State = (Memory, Address, RelativeBase, Input, Output, Halted)
 
-routine :: String
-routine =
+routine1 :: String
+routine1 =
   -- 1: if hole 3 away
   -- 2: and ground 4 away
   -- 3-4: or hole 1 away
@@ -30,16 +30,35 @@ routine =
   \OR T J\n\
   \WALK\n"
 
+routine2 :: String
+routine2 =
+  -- if B isn't safe
+  -- or C isn't safe (we'll need to jump soon)
+  -- \^
+  -- and D is safe (we'll land somewhere safe if we jump now)
+  -- and H is safe (we can jump again in case we land on a 1 tile island)
+  -- or A isn't safe (we have no choice but to jump)
+  -- \^
+  "NOT B J\n\
+  \NOT C T\n\
+  \OR T J\n\
+  \AND D J\n\
+  \AND H J\n\
+  \NOT A T\n\
+  \OR T J\n\
+  \RUN\n"
+
 part1 :: Memory -> String
 part1 memory =
-  let (_, _, _, _, output, _) = step (memory ++ repeat 0, 0, 0, map ord routine, [], False)
+  let (_, _, _, _, output, _) = step (memory ++ repeat 0, 0, 0, map ord routine1, [], False)
       (head : _) = output
    in if head >= 256 then show head else reverse $ map chr output
 
-part2 :: Memory -> Int
+part2 :: Memory -> String
 part2 memory =
-  let (_, _, _, _, output, _) = step ((2 : drop 1 memory) ++ repeat 0, 0, 0, map ord routine, [], False)
-   in head output
+  let (_, _, _, _, output, _) = step (memory ++ repeat 0, 0, 0, map ord routine2, [], False)
+      (head : _) = output
+   in if head >= 256 then show head else reverse $ map chr output
 
 step :: State -> State
 step state
