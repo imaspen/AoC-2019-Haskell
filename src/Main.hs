@@ -19,6 +19,10 @@ main = do
   putStrLn "Part 1:"
   print $ part1 10007 (lines input)
 
+  putStrLn ""
+  putStrLn "Part 2:"
+  print $ part2 119315717514047 (lines input)
+
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
 
