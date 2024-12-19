@@ -1,27 +1,15 @@
 module Main where
 
 import Data.List.Split
-import Day22.Day22
+import Day23.Day23
 import Paths_AoC2019
 
 main :: IO ()
 main = do
-  testFileName <- getDataFileName "day22.test.txt"
-  testInput <- readFile testFileName
-
-  fileName <- getDataFileName "day22.txt"
+  fileName <- getDataFileName "day23.txt"
   input <- readFile fileName
 
-  putStrLn "Part 1 Test:"
-  print $ [9, 2, 5, 8, 1, 4, 7, 0, 3, 6] == part1List 10 (lines testInput)
-
-  putStrLn ""
-  putStrLn "Part 1:"
-  print $ part1 10007 (lines input)
-
-  putStrLn ""
-  putStrLn "Part 2:"
-  print $ part2 119315717514047 (lines input)
+  print $ part1 $ csvInts input
 
 listOfInts :: String -> [Integer]
 listOfInts content = map read (lines content)
