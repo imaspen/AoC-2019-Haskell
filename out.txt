@@ -1,0 +1,7 @@
+Build profile: -w ghc-9.4.7 -O1
+In order, the following will be built (use -v for more details):
+ - AoC2019-0.1.0.0 (exe:AoC2019) (file src/Main.hs changed)
+Preprocessing executable 'AoC2019' for AoC2019-0.1.0.0..
+Building executable 'AoC2019' for AoC2019-0.1.0.0..
+[1 of 3] Compiling Day25.Day25      ( src/Day25/Day25.hs, /Users/aspen/Projects/aoc-2019-haskell/dist-newstyle/build/aarch64-osx/ghc-9.4.7/AoC2019-0.1.0.0/x/AoC2019/build/AoC2019/AoC2019-tmp/Day25/Day25.o ) [Source file changed]
+[3 of 3] Compiling Main             ( src/Main.hs, /Users/aspen/Projects/aoc-2019-haskell/dist-newstyle/build/aarch64-osx/ghc-9.4.7/AoC2019-0.1.0.0/x/AoC2019/build/AoC2019/AoC2019-tmp/Main.o ) [Source file changed]
